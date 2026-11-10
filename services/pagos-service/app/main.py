@@ -63,7 +63,10 @@ async def ready(resp: Response) -> dict[str, object]:
     except Exception:
         db_ok = False
 
-    ok = ESTADO["arranco"] and db_ok and (ESTADO["config_version"] > 0 or settings.app_env == "dev")
+    # Validación estricta de configuración y dependencias
+    config_ok = ESTADO["config_version"] > 0 and settings is not None
+    
+    ok = ESTADO["arranco"] and db_ok and config_ok
     if not ok:
         resp.status_code = 503
     return {"ready": ok, "config_version": ESTADO["config_version"], "instance": INSTANCE_ID}
